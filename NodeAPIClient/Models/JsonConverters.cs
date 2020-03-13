@@ -15,12 +15,20 @@ namespace NodeAPIClient.Models
             public override Hash Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
-                JsonSerializerOptions options) => new Hash() { Value = Primitives.FromHexString(reader.GetString()) };
+                JsonSerializerOptions options)
+            {
+                byte[] arr = Primitives.FromHexString(reader.GetString());
+                if (arr == null)
+                {
+                    return null;
+                }
+                return new Hash() { Value = arr };
+            }
 
             public override void Write(
                 Utf8JsonWriter writer,
                 Hash hash,
-                JsonSerializerOptions options) => writer.WriteStringValue(hash.ToString());
+                JsonSerializerOptions options) => writer.WriteStringValue(hash?.ToString());
         }
 
         public class PublicKeyConverter : JsonConverter<PublicKey>
@@ -28,12 +36,20 @@ namespace NodeAPIClient.Models
             public override PublicKey Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
-                JsonSerializerOptions options) => new PublicKey() { Value = Base58.Bitcoin.Decode(reader.GetString()).ToArray() };
+                JsonSerializerOptions options)
+            {
+                string s = reader.GetString();
+                if (s.Equals("null"))
+                {
+                    return null;
+                }
+                return new PublicKey() { Value = Base58.Bitcoin.Decode(s).ToArray() };
+            }
 
             public override void Write(
                 Utf8JsonWriter writer,
                 PublicKey key,
-                JsonSerializerOptions options) => writer.WriteStringValue(key.ToString());
+                JsonSerializerOptions options) => writer.WriteStringValue(key?.ToString());
         }
 
         public class SignatureConverter : JsonConverter<Signature>
@@ -41,12 +57,20 @@ namespace NodeAPIClient.Models
             public override Signature Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
-                JsonSerializerOptions options) => new Signature() { Value = Primitives.FromHexString(reader.GetString()) };
+                JsonSerializerOptions options)
+            {
+                byte[] arr = Primitives.FromHexString(reader.GetString());
+                if (arr == null)
+                {
+                    return null;
+                }
+                return new Signature() { Value = arr };
+            }
 
             public override void Write(
                 Utf8JsonWriter writer,
                 Signature signature,
-                JsonSerializerOptions options) => writer.WriteStringValue(signature.ToString());
+                JsonSerializerOptions options) => writer.WriteStringValue(signature?.ToString());
         }
 
         public class BytesConverter : JsonConverter<byte[]>
@@ -54,7 +78,10 @@ namespace NodeAPIClient.Models
             public override byte[] Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
-                JsonSerializerOptions options) => Primitives.FromHexString(reader.GetString());
+                JsonSerializerOptions options)
+            {
+                return Primitives.FromHexString(reader.GetString());
+            }
 
             public override void Write(
                 Utf8JsonWriter writer,
@@ -67,12 +94,20 @@ namespace NodeAPIClient.Models
             public override UserField.BytesVariant Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
-                JsonSerializerOptions options) => new UserField.BytesVariant() { Value = Primitives.FromHexString(reader.GetString()) };
+                JsonSerializerOptions options)
+            {
+                byte[] arr = Primitives.FromHexString(reader.GetString());
+                if (arr == null)
+                {
+                    return null;
+                }
+                return new UserField.BytesVariant() { Value = arr };
+            }
 
             public override void Write(
                 Utf8JsonWriter writer,
                 UserField.BytesVariant bytes,
-                JsonSerializerOptions options) => writer.WriteStringValue(Primitives.ToHexString(bytes.Value));
+                JsonSerializerOptions options) => writer.WriteStringValue(Primitives.ToHexString(bytes?.Value));
         }
 
         public class UserFieldMoneyConverter : JsonConverter<UserField.MoneyVariant>
@@ -93,7 +128,15 @@ namespace NodeAPIClient.Models
             public override UserField.IntegerVariant Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
-                JsonSerializerOptions options) => new UserField.IntegerVariant() { Value = UInt64.Parse(reader.GetString()) };
+                JsonSerializerOptions options)
+            {
+                string s = reader.GetString();
+                if (s.Equals("null"))
+                {
+                    return null;
+                }
+                return new UserField.IntegerVariant() { Value = UInt64.Parse(s) };
+            }
 
             public override void Write(
                 Utf8JsonWriter writer,

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NodeAPIClient.Models
 {
-    public class UserField
+    public class UserField: ICloneable
     {
         public UInt32 Key { get; set; }
 
@@ -57,6 +57,17 @@ namespace NodeAPIClient.Models
             }
 
             return uf;
+        }
+
+        public object Clone()
+        {
+            return new UserField()
+            {
+                Key = this.Key,
+                Bytes = this.Bytes,
+                Integer = this.Integer,
+                Money = this.Money
+            };
         }
     }
 }

@@ -31,11 +31,6 @@ namespace NodeAPIClient.Models
 
         public List<ContractConfirmation> ContractsApproval { get; set; }
 
-        public Block()
-        {
-            ContractsApproval = new List<ContractConfirmation>();
-        }
-
         internal static Block Parse(byte[] bytes)
         {
             if (bytes == null)

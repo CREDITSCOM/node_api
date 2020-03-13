@@ -14,16 +14,16 @@ namespace GetBlockSample
 
             GetBlockService service = new GetBlockService()
             {
-                RemoteNodeIp = "165.22.212.105", // do6
+                RemoteNodeIp =  "165.22.220.8", // do1
+                //RemoteNodeIp = "165.22.212.105", // do6
                 RemoteNodePort = 9070
             };
 
-            List<Block> blocks = new List<Block>();
             Primitives.Hash stored_hash = null;
             const UInt64 MaxSeq = 30_157_200;
-            for (UInt64 seq = MaxSeq; seq >= 0; seq--)
+            List<Block> blocks = service.GetBlocksRange(MaxSeq, MaxSeq - 19);
+            foreach (var b in blocks)
             {
-                var b = service.GetBlock(seq);
                 if (b == null)
                 {
                     continue;
@@ -86,34 +86,17 @@ namespace GetBlockSample
                 }
             }
 
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-            };
-            options.Converters.Add(new JsonConverters.HashConverter());
-            options.Converters.Add(new JsonConverters.PublicKeyConverter());
-            options.Converters.Add(new JsonConverters.SignatureConverter());
-            options.Converters.Add(new JsonConverters.MoneyConverter());
-            options.Converters.Add(new JsonConverters.BytesConverter());
-            options.Converters.Add(new JsonConverters.UserFieldBytesConverter());
-            options.Converters.Add(new JsonConverters.UserFieldMoneyConverter());
-            options.Converters.Add(new JsonConverters.UserFieldIntegerConverter());
+            string jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeAll);
+            System.IO.File.WriteAllText(@"blocks_all.json", jsonString);
 
-            string jsonString;
-            jsonString = JsonSerializer.Serialize(blocks, options);
+            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeConsensus);
+            System.IO.File.WriteAllText(@"blocks_consensus.json", jsonString);
 
-            System.IO.File.WriteAllText(@"blocks.json", jsonString);
+            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeTransactions);
+            System.IO.File.WriteAllText(@"blocks_transactions.json", jsonString);
 
-            //JsonSerializer serializer = new JsonSerializer();
-            //serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            //serializer.NullValueHandling = NullValueHandling.Ignore;
-
-            //using (StreamWriter sw = new StreamWriter(@"c:\json.txt"))
-            //using (JsonWriter writer = new JsonTextWriter(sw))
-            //{
-            //    serializer.Serialize(writer, product);
-            //    // {"ExpiryDate":new Date(1230375600000),"Price":0}
-            //}
+            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.SkipBinaries);
+            System.IO.File.WriteAllText(@"blocks_skip_bin.json", jsonString);
 
             return;
         }

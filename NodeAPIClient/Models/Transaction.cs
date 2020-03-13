@@ -23,11 +23,6 @@ namespace NodeAPIClient.Models
 
         public Money Fee { get; set; }
 
-        public Transaction()
-        {
-            UserFields = new List<UserField>();
-        }
-
         internal static Transaction Parse(BinaryReader bin)
         {
             Transaction t = new Transaction();
@@ -54,6 +49,7 @@ namespace NodeAPIClient.Models
             int cnt = (int)(uint)bin.ReadByte();
             if(cnt > 0)
             {
+                t.UserFields = new List<UserField>();
                 t.UserFields = new List<UserField>();
                 for(int i = 0; i < cnt; i++)
                 {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NodeAPIClient.Models
 {
-    public class Money
+    public class Money: ICloneable
     {
         public Int32 Integral { get; set; }
         public UInt64 Fraction { get; set; }
@@ -107,6 +107,10 @@ namespace NodeAPIClient.Models
         {
             if (!string.IsNullOrWhiteSpace(src))
             {
+                if(src == "null")
+                {
+                    return null;
+                }
                 string[] parts = src.Split('.');
                 if (parts.Length == 2)
                 {
@@ -122,6 +126,11 @@ namespace NodeAPIClient.Models
                 }
             }
             return new Money() { Integral = 0, Fraction = 0 };
+        }
+
+        public object Clone()
+        {
+            return Money.FromParts(this.Integral, this.Fraction);
         }
     }
 }
