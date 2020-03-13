@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace NodeAPIClient.Models
 {
@@ -21,7 +22,40 @@ namespace NodeAPIClient.Models
 
         public Primitives.Signature Signature { get; set; }
 
+        [JsonIgnore]
         public Money Fee { get; set; }
+
+        /// <summary>   Gets the actual fee which is sum of Fee and possibly Execution Fee</summary>
+        ///
+        /// <value> The actual fee. </value>
+
+        public Money ActualFee
+        {
+            get
+            {
+                if (UserFields != null)
+                {
+                    foreach (var f in UserFields)
+                    {
+                        if(f.Key == EXECUTION_FEE)
+                        {
+                            if (f.Money != null && f.Money.Value != null)
+                            {
+                                return Fee + f.Money.Value;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                return Fee;
+            }
+        }
+
+        // specific user field
+        public const int EXECUTION_FEE = 2;
 
         internal static Transaction Parse(BinaryReader bin)
         {

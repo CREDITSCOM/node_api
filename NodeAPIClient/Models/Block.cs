@@ -83,7 +83,7 @@ namespace NodeAPIClient.Models
                         {
                             foreach(var t in block.Transactions)
                             {
-                                block.RoundCost += t.Fee;
+                                block.RoundCost += t.ActualFee;
                             }
                         }
                     }

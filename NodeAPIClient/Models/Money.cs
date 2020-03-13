@@ -100,6 +100,10 @@ namespace NodeAPIClient.Models
 
         public static Money operator + (Money lhs, Money rhs)
         {
+            if(lhs == null || rhs == null)
+            {
+                return null;
+            }
             Money result = new Money()
             {
                 Integral = lhs.Integral + rhs.Integral,
@@ -116,6 +120,10 @@ namespace NodeAPIClient.Models
 
         public static Money operator - (Money from, Money what)
         {
+            if (from == null || what == null)
+            {
+                return null;
+            }
             Money result = new Money()
             {
                 Integral = from.Integral - what.Integral
