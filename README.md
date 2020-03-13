@@ -1,0 +1,1 @@
+Implements a dotnet core class library that connects to node and retreive various data. Allow develop high level apps which consume node / blockchain data.
