@@ -4,7 +4,7 @@ using System.Text;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace NodeAPI.Services
+namespace NodeAPIClient.Services
 {
     public class GetBlockService
     {

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static NodeAPI.Models.Primitives;
+using static NodeAPIClient.Models.Primitives;
 
-namespace NodeAPI.Models
+namespace NodeAPIClient.Models
 {
     public static class JsonConverters
     {

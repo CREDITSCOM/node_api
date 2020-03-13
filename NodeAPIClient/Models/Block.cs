@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using SauceControl.Blake2Fast;
 
-namespace NodeAPI.Models
+namespace NodeAPIClient.Models
 {
     public class Block
     {

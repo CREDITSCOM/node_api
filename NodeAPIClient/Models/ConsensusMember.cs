@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NodeAPI.Models
+namespace NodeAPIClient.Models
 {
     public class ConsensusMember
     {

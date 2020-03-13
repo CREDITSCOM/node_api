@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace NodeAPI.Models
+namespace NodeAPIClient.Models
 {
     public class UserField
     {

@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using SimpleBase;
 
-namespace NodeAPI.Models
+namespace NodeAPIClient.Models
 {
     public class Primitives
     {
