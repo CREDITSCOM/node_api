@@ -98,6 +98,44 @@ namespace NodeAPIClient.Models
             return sign + $"{Math.Abs(value.Integral)}.{frac.TrimEnd('0')}";
         }
 
+        public static Money operator + (Money lhs, Money rhs)
+        {
+            Money result = new Money()
+            {
+                Integral = lhs.Integral + rhs.Integral,
+                Fraction = lhs.Fraction + rhs.Fraction
+            };
+            if(result.Fraction >= AMOUNT_MAX_FRACTION)
+            {
+                result.Integral += 1;
+                result.Fraction -= AMOUNT_MAX_FRACTION;
+            }
+
+            return result;
+        }
+
+        public static Money operator - (Money from, Money what)
+        {
+            Money result = new Money()
+            {
+                Integral = from.Integral - what.Integral
+            };
+            if (what.Fraction > from.Fraction)
+            {
+                result.Integral -= 1;
+                result.Fraction = from.Fraction + AMOUNT_MAX_FRACTION - what.Fraction;
+            }
+            else
+            {
+                result.Fraction = from.Fraction - what.Fraction;
+            }
+            return result;
+        }
+
+        public bool IsZero => (Integral == 0 && Fraction == 0UL);
+
+        public static readonly Money Zero = new Money() { Integral = 0, Fraction = 0 };
+
         public override string ToString()
         {
             return Money.FormatAmount(this);

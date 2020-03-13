@@ -77,7 +77,17 @@ namespace NodeAPIClient.Models
                         {
                             block.Transactions.Add(Transaction.Parse(bin));
                         }
+
+                        // round cost clarify
+                        if (block.RoundCost.IsZero)
+                        {
+                            foreach(var t in block.Transactions)
+                            {
+                                block.RoundCost += t.Fee;
+                            }
+                        }
                     }
+
 
                     // new wallets
                     cnt = (int)bin.ReadUInt32();
