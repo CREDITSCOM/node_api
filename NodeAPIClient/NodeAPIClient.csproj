@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SauceControl.Blake2Fast" Version="1.0.0" />
+    <PackageReference Include="SimpleBase" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Thrift45">
+      <HintPath>..\thrift-utils\Thrift45.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

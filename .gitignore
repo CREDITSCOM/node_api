@@ -5,6 +5,6 @@
 .vs/
 obj/
 bin/
-NodeAPI/API/NodeApi/
-NodeAPI/API/NodeApiDiag/
-NodeAPI/API/NodeApiExec/
+NodeAPIClient/API/NodeApi/
+NodeAPIClient/API/NodeApiDiag/
+NodeAPIClient/API/NodeApiExec/
