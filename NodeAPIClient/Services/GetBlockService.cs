@@ -342,6 +342,10 @@ namespace NodeAPIClient.Services
         byte[] AcquireBlock(UInt64 sequence)
         {
             var cl = getClient();
+            if(cl == null)
+            {
+                return null;
+            }
             NodeApiExec.PoolGetResult result;
             try
             {
@@ -364,10 +368,7 @@ namespace NodeAPIClient.Services
         {
             if(client == null)
             {
-                TTransport transport = new TSocket(RemoteNodeIp, RemoteNodePort, 60000);
-                TProtocol protocol = new TBinaryProtocol(transport);
-                client = new NodeApiExec.APIEXEC.Client(protocol);
-                transport.Open();
+                client = Api.ClientFactory.CreateExecutorAPIClient(RemoteNodeIp, RemoteNodePort, 60000);
             }
             return client;
         }
