@@ -249,6 +249,7 @@ namespace NodeAPIClient.Services
                 }
             }
             b.RoundCost = (Money) src_block.RoundCost.Clone();
+            b.IntroducedWallets = src_block.IntroducedWallets;
             if(include.Transactions)
             {
                 b.Transactions = new List<Transaction>();
