@@ -26,7 +26,7 @@ namespace NodeAPIClient.Api
             }
             catch(Thrift.TException x)
             {
-                throw new CreateClientFailedException("Failed to create public API client", x);
+                throw new CreateClientFailedException($"Failed to connect to {networkIp}:{port}, host unreachable?", x);
             }
             return client;
         }
@@ -43,7 +43,7 @@ namespace NodeAPIClient.Api
             }
             catch (Exception x)
             {
-                throw new CreateClientFailedException("Failed to create executor API client", x);
+                throw new CreateClientFailedException($"Failed to connect to {networkIp}:{port}, host unreachable?", x);
             }
             return client;
         }
@@ -59,7 +59,7 @@ namespace NodeAPIClient.Api
             }
             catch (Exception x)
             {
-                throw new CreateClientFailedException("Failed to create diagnostic API client", x);
+                throw new CreateClientFailedException($"Failed to connect to {networkIp}:{port}, host unreachable?", x);
             }
             return client;
         }
