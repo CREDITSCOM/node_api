@@ -8,3 +8,6 @@ bin/
 NodeAPIClient/API/NodeApi/
 NodeAPIClient/API/NodeApiDiag/
 NodeAPIClient/API/NodeApiExec/
+NodeApi/
+NodeApiDiag/
+NodeApiExec/
