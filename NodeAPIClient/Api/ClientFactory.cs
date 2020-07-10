@@ -17,7 +17,7 @@ namespace NodeAPIClient.Api
     {
         public static NodeApi.API.Client CreatePublicAPIClient(string networkIp, int port, int timeout)
         {
-            TTransport transport = new TSocket(networkIp, port);
+            TTransport transport = new TSocket(networkIp, port, timeout);
             TBinaryProtocol tr = new TBinaryProtocol(transport);
             var client = new NodeApi.API.Client(tr);
             try
@@ -26,7 +26,7 @@ namespace NodeAPIClient.Api
             }
             catch(Thrift.TException x)
             {
-                throw new CreateClientFailedException("Failed to create public API client", x);
+                throw new CreateClientFailedException($"Failed to connect to {networkIp}:{port}, host unreachable?", x);
             }
             return client;
         }
@@ -34,7 +34,7 @@ namespace NodeAPIClient.Api
 
         public static NodeApiExec.APIEXEC.Client CreateExecutorAPIClient(string networkIp, int port, int timeout)
         {
-            var socket = new TSocket(networkIp, port);
+            var socket = new TSocket(networkIp, port, timeout);
             TBinaryProtocol tr = new TBinaryProtocol(socket);
             var client = new NodeApiExec.APIEXEC.Client(tr);
             try
@@ -43,14 +43,14 @@ namespace NodeAPIClient.Api
             }
             catch (Exception x)
             {
-                throw new CreateClientFailedException("Failed to create executor API client", x);
+                throw new CreateClientFailedException($"Failed to connect to {networkIp}:{port}, host unreachable?", x);
             }
             return client;
         }
 
         public static NodeApiDiag.API_DIAG.Client CreateDiagnosticAPIClient(string networkIp, int port, int timeout)
         {
-            TTransport socket = new TSocket(networkIp, port);
+            TTransport socket = new TSocket(networkIp, port, timeout);
             TBinaryProtocol tr = new TBinaryProtocol(socket);
             var client = new NodeApiDiag.API_DIAG.Client(tr);
             try
@@ -59,7 +59,7 @@ namespace NodeAPIClient.Api
             }
             catch (Exception x)
             {
-                throw new CreateClientFailedException("Failed to create diagnostic API client", x);
+                throw new CreateClientFailedException($"Failed to connect to {networkIp}:{port}, host unreachable?", x);
             }
             return client;
         }

@@ -86,16 +86,16 @@ namespace GetBlockSample
                 }
             }
 
-            string jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeAll);
+            string jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeAll, true);
             System.IO.File.WriteAllText(@"blocks_all.json", jsonString);
 
-            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeConsensus);
+            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeConsensus, true);
             System.IO.File.WriteAllText(@"blocks_consensus.json", jsonString);
 
-            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeTransactions);
+            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.IncludeTransactions, true);
             System.IO.File.WriteAllText(@"blocks_transactions.json", jsonString);
 
-            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.SkipBinaries);
+            jsonString = GetBlockService.ToJson(blocks, GetBlockService.BlockContent.SkipBinaries, true);
             System.IO.File.WriteAllText(@"blocks_skip_bin.json", jsonString);
 
             return;

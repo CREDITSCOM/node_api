@@ -11,9 +11,52 @@ namespace NodeAPIClient.Services
 {
     public class GetBlockService
     {
-        public string RemoteNodeIp { get; set; }
+        public string RemoteNodeIp {
+            get
+            {
+                return remote_ip;
+            }
+            set
+            {
+                if(string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(remote_ip) || !remote_ip.Equals(value))
+                {
+                    client = null;
+                    remote_ip = value;
+                }
+            }
+        }
 
-        public UInt16 RemoteNodePort { get; set; }
+        public UInt16 RemoteNodePort
+        {
+            get
+            {
+                return remote_port;
+            }
+            set
+            {
+                if(remote_port != value)
+                {
+                    client = null;
+                    remote_port = value;
+                }
+            }
+        }
+
+        public int RequestTimeout
+        {
+            get
+            {
+                return current_timeout;
+            }
+            set
+            {
+                if(current_timeout != value)
+                {
+                    client = null;
+                    current_timeout = value;
+                }
+            }
+        }
 
         public Models.Block GetBlock(UInt64 sequence)
         {
@@ -149,11 +192,11 @@ namespace NodeAPIClient.Services
             };
         }
 
-        public static string ToJson(List<Models.Block> blocks, BlockContent include)
+        public static string ToJson(List<Models.Block> blocks, BlockContent include, bool FormatIntended)
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
+                WriteIndented = FormatIntended,
             };
             options.Converters.Add(new JsonConverters.HashConverter());
             options.Converters.Add(new JsonConverters.PublicKeyConverter());
@@ -206,6 +249,7 @@ namespace NodeAPIClient.Services
                 }
             }
             b.RoundCost = (Money) src_block.RoundCost.Clone();
+            b.IntroducedWallets = src_block.IntroducedWallets;
             if(include.Transactions)
             {
                 b.Transactions = new List<Transaction>();
@@ -364,11 +408,15 @@ namespace NodeAPIClient.Services
 
         NodeApiExec.APIEXEC.Client client = null;
 
+        string remote_ip = "127.0.0.1";
+        ushort remote_port = 9070;
+        int current_timeout = 60000;
+
         NodeApiExec.APIEXEC.Client getClient()
         {
             if(client == null)
             {
-                client = Api.ClientFactory.CreateExecutorAPIClient(RemoteNodeIp, RemoteNodePort, 60000);
+                client = Api.ClientFactory.CreateExecutorAPIClient(RemoteNodeIp, RemoteNodePort, RequestTimeout);
             }
             return client;
         }
