@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using SauceControl.Blake2Fast;
 
 namespace NodeAPIClient.Models
 {
+
     public class Block
     {
         public byte Version { get; set; }
@@ -31,23 +31,24 @@ namespace NodeAPIClient.Models
 
         public List<ContractConfirmation> ContractsApproval { get; set; }
 
-        internal static Block Parse(byte[] bytes)
+        internal static ResponseBlock Parse(byte[] bytes)
         {
-            if (bytes == null)
+            try
             {
-                return null;
-            }
-            using (BinaryReader bin = new BinaryReader(new MemoryStream(bytes)))
-            {
-                int hashing_len = 0;
-                Block block = new Block();
-                try
+                if (bytes == null)
                 {
+                    return new ResponseBlock() { Success = false, Message = "Input bytes array is null" };
+                }
+
+                using (BinaryReader bin = new BinaryReader(new MemoryStream(bytes)))
+                {
+                    int hashing_len = 0;
+                    Block block = new Block();
                     block.Version = bin.ReadByte();
                     int len = bin.ReadByte();
-                    if(len != Primitives.HashSize)
+                    if (len != Primitives.HashSize)
                     {
-                        return null;
+                        return new ResponseBlock() { Success = false, Message = "The hash size is not equal" };
                     }
                     block.PreviousHash = new Primitives.Hash { Value = bin.ReadBytes(len) };
                     block.Sequence = bin.ReadUInt64();
@@ -81,13 +82,12 @@ namespace NodeAPIClient.Models
                         // round cost clarify
                         if (block.RoundCost.IsZero)
                         {
-                            foreach(var t in block.Transactions)
+                            foreach (var t in block.Transactions)
                             {
                                 block.RoundCost += t.ActualFee;
                             }
                         }
                     }
-
 
                     // new wallets
                     cnt = (int)bin.ReadUInt32();
@@ -120,14 +120,14 @@ namespace NodeAPIClient.Models
                     }
 
                     // consensus info
-                    
+
                     // current RT
                     cnt = (int)(uint)bin.ReadByte();
                     UInt64 bits_trusted = bin.ReadUInt64(); // count of "1" = sig_blk_cnt
                     if (cnt > 0)
                     {
                         block.TrustedNodes = new List<ConsensusMember>();
-                        for(int i = 0; i < cnt; i++)
+                        for (int i = 0; i < cnt; i++)
                         {
                             block.TrustedNodes.Add(new ConsensusMember()
                             {
@@ -138,19 +138,19 @@ namespace NodeAPIClient.Models
 
                     // previous consensus
                     cnt = (int)(uint)bin.ReadByte();
-                    if(cnt > 0)
+                    if (cnt > 0)
                     {
                         block.TrustedApproval = new List<KeyValuePair<int, Primitives.Signature>>();
                         UInt64 bits_appr = bin.ReadUInt64();
                         int sig_prev_rt_cnt = CountBits(bits_appr);
                         int isig = 0;
-                        for(int i = 0; i < cnt; i++)
+                        for (int i = 0; i < cnt; i++)
                         {
-                            if((bits_appr & (0x1UL << i)) == 0)
+                            if ((bits_appr & (0x1UL << i)) == 0)
                             {
                                 continue;
                             }
-                            if(isig >= sig_prev_rt_cnt)
+                            if (isig >= sig_prev_rt_cnt)
                             {
                                 break;
                             }
@@ -160,7 +160,7 @@ namespace NodeAPIClient.Models
                             ));
                             isig++;
                         }
-                        if(isig != sig_prev_rt_cnt)
+                        if (isig != sig_prev_rt_cnt)
                         {
                             //TODO: malformed trusted approval section
                         }
@@ -170,7 +170,7 @@ namespace NodeAPIClient.Models
 
                     // continue read block.TrustedNodes (signatures)
                     cnt = block.TrustedNodes.Count;
-                    for(int i = 0; i < cnt; i++)
+                    for (int i = 0; i < cnt; i++)
                     {
                         if ((bits_trusted & (0x1UL << i)) == 0)
                         {
@@ -181,31 +181,33 @@ namespace NodeAPIClient.Models
 
                     // contract signatures
                     cnt = (int)(uint)bin.ReadByte();
-                    if(cnt > 0)
+                    if (cnt > 0)
                     {
                         block.ContractsApproval = new List<ContractConfirmation>();
-                        for(int i = 0; i < cnt; i++)
+                        for (int i = 0; i < cnt; i++)
                         {
                             block.ContractsApproval.Add(ContractConfirmation.Parse(bin));
                         }
                     }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-                if(bin.BaseStream.Position == bin.BaseStream.Length)
-                {
-                    if(hashing_len > 0)
+
+                    if (bin.BaseStream.Position == bin.BaseStream.Length)
                     {
-                        block.Hash = new Primitives.Hash() { Value = Blake2s.ComputeHash(Primitives.HashSize, bytes.AsSpan(0, hashing_len)) };
+                        if (hashing_len > 0)
+                        {
+                            block.Hash = new Primitives.Hash() { Value = Blake2s.ComputeHash(Primitives.HashSize, bytes.AsSpan(0, hashing_len)) };
+                        }
+                        return new ResponseBlock() { Success = true, Block = block };
                     }
-                    return block;
+
+                    return new ResponseBlock() { Success = false, Message = "The stream postion is not equal to the stream length" };
                 }
             }
-            return null;
+            catch (Exception ex)
+            {
+                return new ResponseBlock() { Success = false, Message = ex.Message };
+            }
         }
-
+    
         // Brian Kernighan's neat idea which iterates as many times as there are bits set:
         static int CountBits(UInt64 value)
         {

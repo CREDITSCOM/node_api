@@ -1,10 +1,7 @@
 ﻿using NodeAPIClient.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
-using Thrift.Protocol;
-using Thrift.Transport;
 using static NodeAPIClient.Models.Primitives;
 
 namespace NodeAPIClient.Services
@@ -58,16 +55,6 @@ namespace NodeAPIClient.Services
             }
         }
 
-        public Models.Block GetBlock(UInt64 sequence)
-        {
-            var bytes = AcquireBlock(sequence);
-            if(bytes == null)
-            {
-                return null;
-            }
-            return Models.Block.Parse(bytes);
-        }
-
         /// <summary>   Acquire and return the blocks in range passed. Support both ascending and descending order.
         ///             If not all blocks in range are available, returns successfully retrieved subset</summary>
         ///
@@ -78,16 +65,22 @@ namespace NodeAPIClient.Services
         ///
         /// <returns>   The successfully retrieved blocks. The order in list is the same as order set by from..to </returns>
 
-        public List<Models.Block> GetBlocksRange(UInt64 from, UInt64 to)
+        public ResponsesBlockList GetBlocksRange(UInt64 from, UInt64 to)
         {
-            List<Models.Block> list = new List<Models.Block>();
+            var list = new ResponsesBlockList();
+            list.SetState(false, $"Blocks from {from} to {to} is not exists");
+
             if (from == to)
             {
                 var b = GetBlock(from);
-                if (b != null)
+                if (!b.Success)
                 {
-                    list.Add(b);
+                    list.SetState(false, b.Message);
+                    return list;
                 }
+
+                list.SetState(true, "");
+                list.Blocks.Add(b);
             }
             else
             {
@@ -96,20 +89,22 @@ namespace NodeAPIClient.Services
                 while(i != to)
                 {
                     var b = GetBlock(i);
-                    if(b == null)
+                    if(!b.Success)
                     {
+                        list.SetState(false, b.Message);
                         break;
                     }
-                    list.Add(b);
-                    Console.WriteLine(b.Sequence.ToString());
+
+                    if (!list.Success)
+                        list.SetState(true, "");
+
+                    list.Blocks.Add(b);
+                    Console.WriteLine(b.Block.Sequence.ToString());
+                    
                     if(desc)
-                    {
                         i--;
-                    }
                     else
-                    {
                         i++;
-                    }
                 }
             }
             return list;
@@ -383,14 +378,17 @@ namespace NodeAPIClient.Services
             return b;
         }
 
-        byte[] AcquireBlock(UInt64 sequence)
+        ResponseBlock GetBlock(UInt64 sequence)
         {
             var cl = getClient();
+            
             if(cl == null)
             {
-                return null;
+                return new ResponseBlock() { Success = false, Message = "Cannot create the Executor API Client" };
             }
+            
             NodeApiExec.PoolGetResult result;
+            
             try
             {
                 result = cl.PoolGet((long)sequence);
@@ -399,11 +397,12 @@ namespace NodeAPIClient.Services
                     return null;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                return new ResponseBlock() { Success = false, Message = ex.Message };
             }
-            return result.Pool;            
+
+            return Block.Parse(result.Pool);             
         }
 
         NodeApiExec.APIEXEC.Client client = null;
