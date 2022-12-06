@@ -138,10 +138,11 @@ namespace NodeAPIClient.Models
 
                     // previous consensus
                     cnt = (int)(uint)bin.ReadByte();
+                    UInt64 bits_appr = bin.ReadUInt64();
                     if (cnt > 0)
                     {
                         block.TrustedApproval = new List<KeyValuePair<int, Primitives.Signature>>();
-                        UInt64 bits_appr = bin.ReadUInt64();
+                        
                         int sig_prev_rt_cnt = CountBits(bits_appr);
                         int isig = 0;
                         for (int i = 0; i < cnt; i++)
